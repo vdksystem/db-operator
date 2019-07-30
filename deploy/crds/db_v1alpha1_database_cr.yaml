@@ -1,0 +1,10 @@
+apiVersion: db.clarizen.cloud/v1alpha1
+kind: Database
+metadata:
+  name: example-database
+spec:
+  type: postgres
+  user: user1
+  class: default
+  protection: true
+

@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: db-operator
+  template:
+    metadata:
+      labels:
+        name: db-operator
+    spec:
+      serviceAccountName: db-operator
+      containers:
+        - name: db-operator
+          # Replace this with the built image name
+          image: vdksystem/db-operator:latest
+          command:
+          - db-operator
+          imagePullPolicy: Always
+          env:
+            - name: WATCH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPERATOR_NAME
+              value: "db-operator"
+
+
+          volumeMounts:
+            - name: config
+              mountPath: "/config"
+              readOnly: true
+      volumes:
+        - name: config
+          secret:
+            secretName: postgres
