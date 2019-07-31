@@ -8,7 +8,7 @@ func createDatabase(db *dbv1alpha1.Database) error {
 	switch db.Spec.Type {
 	case "mysql":
 		log.Info("MySQL is not supported yet", "Db.Namespace", db.Namespace, "Db.Name", db.Name, "Db.Type", db.Spec.Type)
-		db.Status.Phase = "Error"
+		db.Status.Phase = "Unsupported"
 		break
 
 	case "postgres":

@@ -3,11 +3,13 @@ module db-operator
 require (
 	cloud.google.com/go v0.43.0 // indirect
 	contrib.go.opencensus.io/exporter/ocagent v0.5.1 // indirect
-	github.com/Azure/go-autorest v12.3.0+incompatible // indirect
 	github.com/Azure/go-autorest/autorest v0.5.0 // indirect
 	github.com/Azure/go-autorest/autorest/mocks v0.2.0 // indirect
 	github.com/NYTimes/gziphandler v1.0.1 // indirect
+	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751 // indirect
+	github.com/alecthomas/units v0.0.0-20190717042225-c3de453c63f4 // indirect
 	github.com/appscode/jsonpatch v2.0.0+incompatible // indirect
+	github.com/aws/aws-sdk-go v1.21.8
 	github.com/census-instrumentation/opencensus-proto v0.2.1 // indirect
 	github.com/coreos/prometheus-operator v0.31.1 // indirect
 	github.com/emicklei/go-restful v2.9.6+incompatible // indirect
@@ -37,8 +39,8 @@ require (
 	golang.org/x/net v0.0.0-20190724013045-ca1201d0de80 // indirect
 	golang.org/x/sys v0.0.0-20190726091711-fc99dfbffb4e // indirect
 	golang.org/x/tools v0.0.0-20190725161231-2e34cfcb95cb // indirect
+	gomodules.xyz/jsonpatch/v2 v2.0.0 // indirect
 	google.golang.org/grpc v1.22.1 // indirect
-	gopkg.in/yaml.v2 v2.2.2
 	k8s.io/api v0.0.0-20190726022912-69e1bce1dad5
 	k8s.io/apiextensions-apiserver v0.0.0-20190726024412-102230e288fd // indirect
 	k8s.io/apimachinery v0.0.0-20190726022757-641a75999153

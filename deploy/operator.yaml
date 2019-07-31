@@ -18,7 +18,7 @@ spec:
           # Replace this with the built image name
           image: vdksystem/db-operator:latest
           command:
-          - db-operator
+            - db-operator
           imagePullPolicy: Always
           env:
             - name: WATCH_NAMESPACE

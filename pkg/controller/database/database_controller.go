@@ -4,7 +4,6 @@ import (
 	"context"
 	dbv1alpha1 "db-operator/pkg/apis/db/v1alpha1"
 	"github.com/go-logr/logr"
-
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -114,8 +113,14 @@ func (r *ReconcileDatabase) Reconcile(request reconcile.Request) (reconcile.Resu
 		reqLogger.Info("Creating a new Database", "Db.Namespace", instance.Namespace, "Db.Name", instance.Name)
 		err := createDatabase(instance)
 		if err != nil {
-
+			return reconcile.Result{}, err
 		}
+
+		err = grantAccess("All", instance.Name, instance.Spec.User)
+		if err != nil {
+			return reconcile.Result{}, err
+		}
+
 		err = r.client.Update(context.TODO(), instance)
 		if err != nil {
 			return reconcile.Result{}, err
