@@ -30,7 +30,7 @@ spec:
                 fieldRef:
                   fieldPath: metadata.name
             - name: OPERATOR_NAME
-              value: "db-operator"
+              value: "{{ .Chart.Name }}"
 
 
           volumeMounts:

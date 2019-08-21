@@ -1,7 +1,7 @@
 module db-operator
 
 require (
-	cloud.google.com/go v0.43.0 // indirect
+	cloud.google.com/go v0.43.0
 	contrib.go.opencensus.io/exporter/ocagent v0.5.1 // indirect
 	github.com/NYTimes/gziphandler v1.0.1 // indirect
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751 // indirect
@@ -32,6 +32,7 @@ require (
 	github.com/pelletier/go-toml v1.4.0 // indirect
 	github.com/prometheus/common v0.6.0 // indirect
 	github.com/prometheus/procfs v0.0.3 // indirect
+	github.com/sethvargo/go-password v0.1.2
 	github.com/spf13/pflag v1.0.3
 	github.com/spf13/viper v1.4.0
 	golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4 // indirect

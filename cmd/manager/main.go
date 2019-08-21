@@ -28,8 +28,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 	"sigs.k8s.io/controller-runtime/pkg/runtime/signals"
-
-	"github.com/spf13/viper"
 )
 
 // Change below variables to serve metrics on different host or port.
@@ -68,8 +66,6 @@ func main() {
 	logf.SetLogger(zap.Logger())
 
 	printVersion()
-
-	initConfig()
 
 	namespace, err := k8sutil.GetWatchNamespace()
 	if err != nil {
@@ -163,18 +159,4 @@ func serveCRMetrics(cfg *rest.Config) error {
 		return err
 	}
 	return nil
-}
-
-func initConfig() {
-	viper.AddConfigPath(".")
-	viper.AddConfigPath("/config")
-	viper.SetConfigName("database")
-
-	// TODO: set defaults
-
-	err := viper.ReadInConfig()
-	if err != nil {
-		log.Error(err, "Failed to read config")
-		os.Exit(1)
-	}
 }

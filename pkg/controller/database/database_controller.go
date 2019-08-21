@@ -3,16 +3,24 @@ package database
 import (
 	"context"
 	dbv1alpha1 "db-operator/pkg/apis/db/v1alpha1"
+	"fmt"
 	"github.com/go-logr/logr"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"os"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
+	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
+	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 	"sigs.k8s.io/controller-runtime/pkg/source"
+	"strings"
+	"time"
 )
 
 var log = logf.Log.WithName("controller_database")
@@ -38,8 +46,30 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 		return err
 	}
 
+	pred := predicate.Funcs{
+		UpdateFunc: func(e event.UpdateEvent) bool {
+			// Ignore updates to CR status in which case metadata.Generation does not change
+			// Metadata.generation changes if Spec was changed
+			fmt.Println("Update event")
+
+			return inWatchedNamespace(e.MetaNew.GetNamespace()) && e.MetaOld.GetGeneration() != e.MetaNew.GetGeneration()
+		},
+		CreateFunc: func(e event.CreateEvent) bool {
+			watchTime := time.Now().Add(-1 * time.Minute)
+			creationTime := e.Meta.GetCreationTimestamp()
+
+			return inWatchedNamespace(e.Meta.GetNamespace()) && creationTime.After(watchTime)
+		},
+		DeleteFunc: func(e event.DeleteEvent) bool {
+			return inWatchedNamespace(e.Meta.GetNamespace())
+		},
+		GenericFunc: func(e event.GenericEvent) bool {
+			return inWatchedNamespace(e.Meta.GetNamespace())
+		},
+	}
+
 	// Watch for changes to primary resource Database
-	err = c.Watch(&source.Kind{Type: &dbv1alpha1.Database{}}, &handler.EnqueueRequestForObject{})
+	err = c.Watch(&source.Kind{Type: &dbv1alpha1.Database{}}, &handler.EnqueueRequestForObject{}, pred)
 	if err != nil {
 		return err
 	}
@@ -107,43 +137,46 @@ func (r *ReconcileDatabase) Reconcile(request reconcile.Request) (reconcile.Resu
 		}
 	}
 
+	usr := &user{}
 	// Check if this Database already exists and status is "Created"
-	status := instance.Status.Phase
-	if status != "Created" {
-		reqLogger.Info("Creating a new Database", "Db.Namespace", instance.Namespace, "Db.Name", instance.Name)
-		err := createDatabase(instance)
-		if err != nil {
-			return reconcile.Result{}, err
-		}
-
-		err = grantAccess("All", instance.Name, instance.Spec.User)
-		if err != nil {
-			return reconcile.Result{}, err
-		}
-
-		err = r.client.Update(context.TODO(), instance)
-		if err != nil {
-			return reconcile.Result{}, err
-		}
-
-		// Database created successfully - don't requeue
-		return reconcile.Result{}, nil
+	err = updateEvent(instance, usr)
+	if err != nil {
+		return reconcile.Result{}, err
 	}
 
-	// Pod already exists - don't requeue
-	reqLogger.Info("Skip reconcile: Database already exists", "Db.Namespace", instance.Namespace, "Db.Name", instance.Name)
+	// If secret was set, we have to create k8s secret
+	if usr.password != "" {
+		secret, err := updateSecret(instance, usr)
+		if err != nil {
+			return reconcile.Result{}, err
+		}
+		err = r.client.Create(context.TODO(), secret)
+		if err != nil {
+			return reconcile.Result{}, err
+		}
+	}
+
+	err = r.client.Status().Update(context.TODO(), instance)
+	if err != nil {
+		return reconcile.Result{}, err
+	}
+
+	// Database created/updated successfully - don't requeue
 	return reconcile.Result{}, nil
 }
 
 func (r *ReconcileDatabase) finalizeDatabase(reqLogger logr.Logger, m *dbv1alpha1.Database) error {
-	if m.Spec.Protection {
-		log.Info("Database won't be deleted! Protection is set to true.")
-	} else {
-		err := postgresDelDB(m.Name)
-		if err != nil {
-			return err
-		}
+	err := deleteEvent(m)
+	if err != nil {
+		return err
 	}
+
+	err = r.client.Delete(context.TODO(), &v1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      fmt.Sprintf("%s-db-secret", m.Name),
+			Namespace: m.Namespace,
+		},
+	})
 
 	reqLogger.Info("Successfully finalized database")
 	return nil
@@ -178,4 +211,10 @@ func remove(list []string, s string) []string {
 		}
 	}
 	return list
+}
+
+func inWatchedNamespace(ns string) bool {
+	watchedNamespaces := strings.Split(os.Getenv("NAMESPACES"), ",")
+
+	return contains(watchedNamespaces, ns)
 }

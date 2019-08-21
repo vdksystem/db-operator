@@ -1,10 +1,9 @@
 apiVersion: db.clarizen.cloud/v1alpha1
 kind: Database
 metadata:
-  name: example-database
+  name: test-db
 spec:
   type: postgres
-  user: user
-  class: default
-  protection: false
-
+  protected: false
+  users:
+    - user

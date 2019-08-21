@@ -6,6 +6,6 @@ subjects:
   - kind: ServiceAccount
     name: db-operator
 roleRef:
-  kind: Role
+  kind: ClusterRole
   name: db-operator
   apiGroup: rbac.authorization.k8s.io
