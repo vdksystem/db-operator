@@ -1,0 +1,18 @@
+Operator will watch for objects of Database type and will manage databases in provided database server.
+{{- range $namespace := .Values.watchNamespaces }}
+  - {{ $namespace }}
+{{- end }}
+Now you can create object with the declaration above:
+
+apiVersion: db.clarizen.cloud/v1alpha1
+kind: Database
+metadata:
+  name: example-database
+spec:
+  type: postgres
+  user: user
+  class: default
+  protection: false
+
+Detailed information you can find in the confluence:
+http://

@@ -1,0 +1,9 @@
+postgres:
+  aws_iam: true
+  aws_region: eu-west-1
+
+  host: postgresql-postgresql
+  password: FtmT3PHQZy
+
+  user: postgres
+  database: postgres
