@@ -77,12 +77,12 @@ roleRef:
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-    name: {{ include "db-operator.fullname" . }}
+    name: {{ include "db-operator.fullname" $ }}
     namespace: {{ . }}
 subjects:
     - kind: ServiceAccount
-      name: {{ include "db-operator.fullname" . }}
-      namespace: {{ .Release.Namespace }}
+      name: {{ include "db-operator.fullname" $ }}
+      namespace: {{ $.Release.Namespace }}
 roleRef:
     kind: ClusterRole
     name: {{- printf "%s-%s" include "db-operator.fullname" . "secrets" -}}
