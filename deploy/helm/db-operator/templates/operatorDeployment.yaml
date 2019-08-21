@@ -30,22 +30,22 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
           {{ if (.Values.namespaces) }}
-            - name: NAMESPACES
-              value: {{ include "helm-toolkit.utils.joinListWithComma" .Values.namespaces }}
-            - name: WATCH_NAMESPACE
-              value: ""
+          - name: NAMESPACES
+            value: {{ include "helm-toolkit.utils.joinListWithComma" .Values.namespaces }}
+          - name: WATCH_NAMESPACE
+            value: ""
           {{ else }}
-            - name: WATCH_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
+          - name: WATCH_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
           {{ end }}
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-            - name: OPERATOR_NAME
-              value: {{ .Chart.Name }}
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: OPERATOR_NAME
+            value: {{ .Chart.Name }}
 
           volumeMounts:
             - name: config
@@ -56,15 +56,15 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
     {{- with .Values.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
+    affinity:
+      {{- toYaml . | nindent 8 }}
     {{- end }}
     {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
+    tolerations:
+      {{- toYaml . | nindent 8 }}
     {{- end }}
-      volumes:
-        - name: config
-          secret:
-            secretName: {{ include "db-operator.fullname" . }}
-      serviceAccountName: {{ include "db-operator.fullname" . }}
+    volumes:
+      - name: config
+        secret:
+          secretName: {{ include "db-operator.fullname" . }}
+    serviceAccountName: {{ include "db-operator.fullname" . }}
