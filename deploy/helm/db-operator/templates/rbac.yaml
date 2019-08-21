@@ -58,6 +58,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: {{ include "db-operator.fullname" . }}
+    namespace: {{ .Release.Namespace }}
 roleRef:
   kind: ClusterRole
   name: {{ include "db-operator.fullname" . }}
