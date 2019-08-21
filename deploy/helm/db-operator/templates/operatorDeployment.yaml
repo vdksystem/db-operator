@@ -18,6 +18,7 @@ spec:
         app.kubernetes.io/name: {{ include "db-operator.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
+      serviceAccountName: {{ include "db-operator.fullname" . }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -67,4 +68,3 @@ spec:
       - name: config
         secret:
           secretName: {{ include "db-operator.fullname" . }}
-    serviceAccountName: {{ include "db-operator.fullname" . }}
