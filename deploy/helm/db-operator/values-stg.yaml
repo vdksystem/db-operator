@@ -1,0 +1,44 @@
+replicaCount: 1
+
+image:
+  repository: 868766274025.dkr.ecr.eu-west-1.amazonaws.com/k8s/db-operator
+  tag: 0.1.0
+  pullPolicy: Always
+
+nameOverride: ""
+fullnameOverride: ""
+
+# If chart should manage permissions
+rbac:
+  enabled: true
+
+db:
+  user: "db_operator"
+  host: "stg-aurora-cluster.cluster-cw1qo4roadj2.eu-west-1.rds.amazonaws.com"
+  password: "use --set"
+  database: "postgres"
+
+#  Namespaces to watch
+namespaces:
+  - eagle
+  - bot
+  - falcon
+  - services
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
