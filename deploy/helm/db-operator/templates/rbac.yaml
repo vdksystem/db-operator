@@ -85,7 +85,7 @@ subjects:
       namespace: {{ $.Release.Namespace }}
 roleRef:
     kind: ClusterRole
-    name: {{- printf "%s-%s" include "db-operator.fullname" . "secrets" -}}
+    name: {{- printf "%s-%s" (include "db-operator.fullname" $)  "secrets" -}}
     apiGroup: rbac.authorization.k8s.io
 {{- end }}
 {{- end }}
