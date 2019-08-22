@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: vdksystem/db-operator
+  repository: 868766274025.dkr.ecr.eu-west-1.amazonaws.com/k8s/db-operator
   tag: 0.1.0
   pullPolicy: Always
 
