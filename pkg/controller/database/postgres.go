@@ -50,7 +50,7 @@ func postgresUpdateEvent(db *v1alpha1.Database, usr *user) error {
 	users := db.Spec.Users
 	if db.Status.Phase == "" {
 		//TODO
-		fmt.Println("Create event")
+		log.Info("Create event")
 		//reqLogger.Info("Creating a new Database", "Db.Namespace", instance.Namespace, "Db.Name", instance.Name)
 		// If we have nothing in the status -> it's create event
 		err := postgresCreateDB(db.Name)
@@ -79,21 +79,18 @@ func postgresUpdateEvent(db *v1alpha1.Database, usr *user) error {
 }
 
 func postgresCreateDB(dbName string) error {
-	fmt.Println("Creating new database")
 	query := fmt.Sprintf(`CREATE DATABASE "%s"`, dbName)
-	println(query)
 	_, err := dbCon.Exec(query)
 	if err != nil {
 		log.Error(err, "Unable to create database", "Database:", dbName)
 		return err
 	}
-	fmt.Println("Database was successfully created!")
+	log.Info("Database was successfully created!")
 
 	return err
 }
 
 func postgresCreateUser(db *v1alpha1.Database, usr *user) error {
-	fmt.Println("Creating new user")
 	password, err := genPassword()
 	if err != nil {
 		return err
@@ -102,21 +99,19 @@ func postgresCreateUser(db *v1alpha1.Database, usr *user) error {
 	usr.username = db.Name
 
 	query := fmt.Sprintf(`CREATE USER "%s" WITH ENCRYPTED PASSWORD '%s'`, usr.username, usr.password)
-	println(query)
 	_, err = dbCon.Exec(query)
 	if err != nil {
 		log.Error(err, "Unable to create user", "User:", usr.username)
 		return err
 	}
 
-	fmt.Println("User was successfully created!")
+	log.Info("User was successfully created!")
 
 	return err
 }
 
 func postgresRevokeUser(user string, role string) error {
 	query := fmt.Sprintf(`REVOKE "%s" FROM "%s"`, role, user)
-	println(query)
 	_, err := dbCon.Exec(query)
 	return err
 }
@@ -127,7 +122,6 @@ func postgresDelUser(userName string) (string, error) {
 
 func postgresDelDB(dbName string) error {
 	query := fmt.Sprintf(`DROP DATABASE "%s"`, dbName)
-	println(query)
 	_, err := dbCon.Exec(query)
 	if err != nil {
 		log.Error(err, "Unable to drop the database", "Database:", dbName)
@@ -139,15 +133,13 @@ func postgresDelDB(dbName string) error {
 func postgresGrantAllWithRole(users []string, database string) error {
 	roleName := fmt.Sprintf(`%s_owners`, database)
 	query := fmt.Sprintf(`CREATE ROLE "%s"`, roleName)
-	println(query)
 	_, err := dbCon.Exec(query)
 	if err != nil {
 		log.Error(err, "Unable to create ROLE", "Role prefix:", database)
 		return err
 	}
-	query = fmt.Sprintf(`GRANT ALL on DATABASE "%s" to "%s"`, database, roleName)
-	println(query)
 
+	query = fmt.Sprintf(`GRANT ALL on DATABASE "%s" to "%s"`, database, roleName)
 	if _, err := dbCon.Exec(query); err != nil {
 		return err
 	}
@@ -160,7 +152,6 @@ func postgresGrantAllWithRole(users []string, database string) error {
 func postgresGrantAll(users []string, database string) error {
 	userlist := strings.Join(users, `", "`)
 	query := fmt.Sprintf(`GRANT "%s" to "%s"`, database, userlist)
-	println(query)
 	_, err := dbCon.Exec(query)
 	if err != nil {
 		log.Error(err, "Unable to assign permissions", "Database:", database, "Users: ", userlist)
@@ -207,7 +198,7 @@ func getRoleUsers(roleName string) ([]string, error) {
 
 	rows, err := dbCon.Query(query)
 	if err != nil {
-		println(err.Error())
+		log.Error(err, err.Error())
 	}
 	defer rows.Close()
 
@@ -237,7 +228,6 @@ func postgresDeleteEvent(db *v1alpha1.Database) error {
 
 	roleName := fmt.Sprintf(`%s_owners`, db.Name)
 	query := fmt.Sprintf(`DROP ROLE "%s"`, roleName)
-	println(query)
 	_, err := dbCon.Exec(query)
 	if err != nil {
 		log.Error(err, "Unable to drop ROLE", "Role:", roleName)
@@ -246,7 +236,6 @@ func postgresDeleteEvent(db *v1alpha1.Database) error {
 		log.Info("Role was successfully deleted", "Role:", roleName)
 	}
 	query = fmt.Sprintf(`DROP USER "%s"`, db.Name)
-	println(query)
 	_, err = dbCon.Exec(query)
 	if err != nil {
 		log.Error(err, "Unable to drop User", "User:", db.Name)

@@ -4,6 +4,6 @@ metadata:
   name: test-db
 spec:
   type: postgres
-  protected: false
+  drop: true
   users:
-    - user
+    - falcon_admin

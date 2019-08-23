@@ -50,7 +50,7 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 		UpdateFunc: func(e event.UpdateEvent) bool {
 			// Ignore updates to CR status in which case metadata.Generation does not change
 			// Metadata.generation changes if Spec was changed
-			fmt.Println("Update event")
+			log.Info("Update event")
 
 			return inWatchedNamespace(e.MetaNew.GetNamespace()) && e.MetaOld.GetGeneration() != e.MetaNew.GetGeneration()
 		},
