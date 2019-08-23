@@ -6,9 +6,9 @@ import (
 
 type DatabaseSpec struct {
 	// Add custom validation using kubebuilder tags: https://book-v1.book.kubebuilder.io/beyond_basics/generating_crd.html
-	Type      string   `json:"type"`
-	Users     []string `json:"users"`
-	Protected bool     `json:"protected"`
+	Type  string   `json:"type"`
+	Users []string `json:"users"`
+	Drop  bool     `json:"drop"`
 }
 
 type DatabaseStatus struct {

@@ -226,13 +226,13 @@ func getRoleUsers(roleName string) ([]string, error) {
 }
 
 func postgresDeleteEvent(db *v1alpha1.Database) error {
-	if db.Spec.Protected {
-		log.Info("Database won't be deleted! Protected is set to true.")
-	} else {
+	if db.Spec.Drop {
 		err := postgresDelDB(db.Name)
 		if err != nil {
 			return err
 		}
+	} else {
+		log.Info("Database won't be deleted! Protected is set to true.")
 	}
 
 	roleName := fmt.Sprintf(`%s_owners`, db.Name)

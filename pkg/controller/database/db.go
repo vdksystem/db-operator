@@ -29,13 +29,13 @@ func updateEvent(db *dbv1alpha1.Database, usr *user) error {
 }
 
 func deleteEvent(db *dbv1alpha1.Database) error {
-	if db.Spec.Protected {
-		log.Info("Database won't be deleted! Protected is set to true.")
-	} else {
+	if db.Spec.Drop {
 		err := postgresDeleteEvent(db)
 		if err != nil {
 			return err
 		}
+	} else {
+		log.Info("Database won't be deleted! Drop is set to false.")
 	}
 	return nil
 }
